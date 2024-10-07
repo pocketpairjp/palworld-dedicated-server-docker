@@ -1,0 +1,1 @@
+# palworld-dedicated-server
