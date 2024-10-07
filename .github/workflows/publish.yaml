@@ -1,0 +1,45 @@
+name: Publish ECR image to GHCR
+
+on:
+  workflow_dispatch:
+    inputs:
+      ecr_tag_name:
+        description: 'Tag name in ECR to pull'
+        required: true
+        default: 'latest'
+      ghcr_tag_name:
+        description: 'Tag name in GHCR to push'
+        required: true
+        default: 'latest'
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_DEFAULT_REGION }}
+
+      - name: Login to Amazon ECR
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Pull image from ECR
+        run: docker pull ${{ secrets.ECR_REPO_DOMAIN }}/palserver_linux_publish_testing:${{ github.event.inputs.ecr_tag_name }}
+
+      - name: Login to GHCR
+        run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+
+      - name: Tag image for GHCR
+        run: docker tag ${{ secrets.ECR_REPO_DOMAIN }}/palserver_linux_publish_testing:${{ github.event.inputs.ecr_tag_name }} ghcr.io/${{ github.repository_owner }}/palserver_linux_publish_testing:${{ github.event.inputs.ghcr_tag_name }}
+
+      - name: Push image to GHCR
+        run: docker push ghcr.io/${{ github.repository_owner }}/palserver_linux_publish_testing:${{ github.event.inputs.ghcr_tag_name }}
