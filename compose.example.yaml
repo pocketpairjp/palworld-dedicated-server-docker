@@ -1,0 +1,14 @@
+services:
+  palworld-server:
+    image: ghcr.io/palworld/palserver:v0.3.9.59545
+    command:
+      - -port=8211
+      - -useperfthreads
+      - -NoAsyncLoadingThread
+      - -UseMultithreadForDS
+    ports:
+      - "8211:8211"
+    volumes:
+      - PalWorldSettings.ini:/pal/Package/Pal/Saved/Config/LinuxServer/PalWorldSettings.ini:ro
+      - SaveGames:/pal/Package/Pal/Saved/SaveGames
+

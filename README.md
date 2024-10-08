@@ -1,2 +1,3 @@
-# palworld-dedicated-server
+# palworld-dedicated-server-docker
 
+We are just getting ready.
