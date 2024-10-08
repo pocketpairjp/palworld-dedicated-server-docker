@@ -33,7 +33,7 @@ jobs:
         uses: aws-actions/amazon-ecr-login@v2
 
       - name: Pull image from ECR
-        run: docker pull ${{ secrets.ECR_REPO_DOMAIN }}/palserver_linux_publish_testing:${{ github.event.inputs.ecr_tag_name }}
+        run: docker pull ${{ secrets.ECR_REPO_DOMAIN }}/palserver_linux_shipping:${{ github.event.inputs.ecr_tag_name }}
 
       - name: Login to GHCR
         run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
