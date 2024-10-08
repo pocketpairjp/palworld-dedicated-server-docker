@@ -39,7 +39,7 @@ jobs:
         run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
 
       - name: Tag image for GHCR
-        run: docker tag ${{ secrets.ECR_REPO_DOMAIN }}/palserver_linux_publish_testing:${{ github.event.inputs.ecr_tag_name }} ghcr.io/${{ github.repository_owner }}/palserver_linux_publish_testing:${{ github.event.inputs.ghcr_tag_name }}
+        run: docker tag ${{ secrets.ECR_REPO_DOMAIN }}/palserver_linux_shipping:${{ github.event.inputs.ecr_tag_name }} ghcr.io/${{ github.repository_owner }}/palserver:${{ github.event.inputs.ghcr_tag_name }}
 
       - name: Push image to GHCR
-        run: docker push ghcr.io/${{ github.repository_owner }}/palserver_linux_publish_testing:${{ github.event.inputs.ghcr_tag_name }}
+        run: docker push ghcr.io/${{ github.repository_owner }}/palserver:${{ github.event.inputs.ghcr_tag_name }}
