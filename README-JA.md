@@ -20,7 +20,7 @@ Palworldサーバーガイドも併せてご確認ください。
 Docker Composeを利用して簡単に専用サーバーを立ち上げることもできます。
 
 ### 起動と終了
-```
+```shell
 # compose.yaml が存在するフォルダで操作を行ってください。
 > ls
 compose.yaml
@@ -47,9 +47,9 @@ compose.yaml
 
 プレイヤー人数やポートの変更など、引数を通した設定を行いたい場合は `compose.yaml` を編集してください。
 
-```
+```yaml
 services:
-    // ... //
+    # ... #
     command:
       - -port=8211
       - -useperfthreads
@@ -66,7 +66,7 @@ OptionSettings=(ServerPassword="quivern0119",DeathPenalty=None)
 
 デフォルトの設定値を確認したい場合はイメージ内の `/pal/Package/DefaultPalWorldSettings.ini` をご確認ください。 `docker compose up` コマンドで専用サーバーを立ち上げたあと下記コマンドで確認を行うことができます。このファイルを直接編集してもゲーム内に設定は反映されないので注意してください。
 
-```
+```ini
 > docker compose exec palworld-server bash -c "cat /pal/Package/DefaultPalWorldSettings.ini"
 ; This configuration file is a sample of the default server settings.
 ; Changes to this file will NOT be reflected on the server.
