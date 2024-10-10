@@ -7,7 +7,6 @@ services:
       - -NoAsyncLoadingThread
       - -UseMultithreadForDS
     ports:
-      - "8211:8211"
+      - "8211:8211/udp"
     volumes:
-      - ./PalWorldSettings.ini:/pal/Package/Pal/Saved/Config/LinuxServer/PalWorldSettings.ini:ro
-      - ./SaveGames:/pal/Package/Pal/Saved/SaveGames
+      - ./Saved:/pal/Package/Pal/Saved
