@@ -5,13 +5,15 @@ services:
 
     # https://tech.palworldgame.com/settings-and-operation/arguments
     command:
+      - /pal/helper.sh
       - -port=8211
       - -useperfthreads
       - -NoAsyncLoadingThread
       - -UseMultithreadForDS
-    
+
     ports:
       - "8211:8211/udp"
     
     volumes:
+      - ./helper.sh:/pal/helper.sh
       - ./Saved:/pal/Package/Pal/Saved
