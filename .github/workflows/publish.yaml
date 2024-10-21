@@ -45,5 +45,5 @@ jobs:
 
       - name: Push image to GHCR
         run: |
-          docker push ghcr.io/${{ github.repository_owner }}/palserver:${{ github.event.inputs.ghcr_tag_name
+          docker push ghcr.io/${{ github.repository_owner }}/palserver:${{ github.event.inputs.ghcr_tag_name }}
           docker push ghcr.io/${{ github.repository_owner }}/palserver:latest
