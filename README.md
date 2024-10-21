@@ -2,24 +2,29 @@
 
 [ENGLISH](README.md) | [日本語](README-JA.md)
 
-This repository provides a Docker image and a Docker Compose sample for hosting an official dedicated server for multiplayer in [Palworld](https://www.pocketpair.jp/palworld?lang=en).
+We provide the Docker image and sample Docker Compose files for the official dedicated server, enabling multiplayer for [Palworld](https://www.pocketpair.jp/palworld?lang=en). Please also check the Palworld server guide.
 
-Please also refer to the Palworld Server Guide for more details.
+[Introduction | Palworld Server Guide](https://tech.palworldgame.com/)
 
-- Palworld Server Guide: [https://tech.palworldgame.com/en/](https://tech.palworldgame.com/en/)
+### Note
+The distributed `compose.yaml` file is a sample. Edit it as necessary to fit your environment and verify that save data is correctly saved before using it.
+
+Also, running this on Windows/macOS using Docker Desktop is not recommended, as disk write/read speeds are limited. Consider using the Steam-based method instead.
+
+[Requirements | Palworld Server Guide](https://tech.palworldgame.com/getting-started/requirements)
 
 ## Official Dedicated Server Image
 
-The image is available at the following page:
+The image is distributed via GitHub Packages.
 
-- Package palserver: [https://github.com/pocketpairjp/palworld-dedicated-server-docker/pkgs/container/palserver](https://github.com/pocketpairjp/palworld-dedicated-server-docker/pkgs/container/palserver)
+[Package palserver](https://github.com/pocketpairjp/palworld-dedicated-server-docker/pkgs/container/palserver)
 
 ## Docker Compose
 You can easily set up a dedicated server using Docker Compose.
 
 ### Starting and Stopping
 ```shell
-# Perform operations in the folder containing compose.yaml.
+# Check the folder containing compose.yaml.
 > ls
 compose.yaml
 
@@ -39,7 +44,7 @@ When you start the server using the `docker compose up` command, save files and 
 
 For details on each configuration item, please refer to the Palworld Server Guide.
 
-- Palworld Server Guide: [https://tech.palworldgame.com/en/](https://tech.palworldgame.com/en/)
+[Settings and Operations | Palworld Server Guide](https://tech.palworldgame.com/category/settings-and-operations)
 
 If you want to adjust player count, port settings, or other parameters, edit the `compose.yaml` file.
 
@@ -60,7 +65,7 @@ To adjust settings like game balance or server name, edit ./Saved/Config/LinuxSe
 OptionSettings=(ServerPassword="quivern0119",DeathPenalty=None)
 ```
 
-To check the default configuration values, refer to /pal/Package/DefaultPalWorldSettings.ini inside the image. After starting the dedicated server with the docker compose up command, you can check the contents using the following command. Note that directly editing this file will not apply changes in the game.
+To check the default settings, refer to the `/pal/Package/DefaultPalWorldSettings.ini` file inside the image. After starting the dedicated server with the `docker compose up` command, you can use the following command to check the contents. Note that editing this file directly will not reflect the changes in the game.
 
 ```ini
 > docker compose exec palworld-server bash -c "cat /pal/Package/DefaultPalWorldSettings.ini"
@@ -73,9 +78,4 @@ OptionSettings=(Difficulty=None // ... //)
 
 ### Updating the Dedicated Server
 
-You can update the server by changing the image part at the end of the compose.yaml file. Always back up your save data before performing an update.
-
-### Troubleshooting
-
-#### Q. I can't connect to the server from the game
-If you are using Windows Subsystem for Linux, there is a known issue where connecting via localhost does not work. Please use 127.0.0.1 instead.
+**Be sure to back up your data before updating.** Stop the server with the `docker compose down` command, update the image tag in `compose.yaml` to match the game version, and restart with the `docker compose up -d` command.

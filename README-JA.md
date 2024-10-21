@@ -2,48 +2,49 @@
 
 [ENGLISH](README.md) | [日本語](README-JA.md)
 
-[Palworld](https://www.pocketpair.jp/palworld?lang=ja)のマルチプレイを可能にする、公式専用サーバーのDockerイメージとDocker Composeのサンプルを配布しています。
+[Palworld](https://www.pocketpair.jp/palworld?lang=ja)のマルチプレイを可能にする、公式専用サーバーのDockerイメージとDocker Composeのサンプルを配布しています。 Palworldサーバーガイドも併せてご確認ください。
 
-Palworldサーバーガイドも併せてご確認ください。
+[はじめに | Palworld Server Guide](https://tech.palworldgame.com/ja/)
 
-- Palworldサーバーガイド
-[https://tech.palworldgame.com/ja/](https://tech.palworldgame.com/ja/)
+### Note
+配布している `compose.yaml` ファイルはサンプルです。ご利用の環境で適宜編集し、セーブデータがきちんと保存されるか確認してからご利用ください。
+
+また、Docker Desktopを用いたWindows / macOS環境での実行はディスク書き込み・読み込み速度が制限されるため非推奨です。代わりにSteamを利用した方法をご検討ください。
+
+[要件 | Palworld Server Guide](https://tech.palworldgame.com/ja/getting-started/requirements)
 
 ## 公式専用サーバーのイメージ
 
-下記ページでイメージを配布しています。
+GitHub Packagesでイメージを配布しています。
 
-- Package palserver
-[https://github.com/pocketpairjp/palworld-dedicated-server-docker/pkgs/container/palserver](https://github.com/pocketpairjp/palworld-dedicated-server-docker/pkgs/container/palserver)
+[Package palserver](https://github.com/pocketpairjp/palworld-dedicated-server-docker/pkgs/container/palserver)
 
 ## Docker Compose
 Docker Composeを利用して簡単に専用サーバーを立ち上げることもできます。
 
 ### 起動と終了
 ```shell
-# compose.yaml が存在するフォルダで操作を行ってください。
+# Check the folder containing compose.yaml.
 > ls
 compose.yaml
 
-# 起動
+# Start the server
 > docker compose up -d
 
-# 終了
+# Stop the server
 > docker compose down
 
-# ログの確認
+# View logs
 > docker compose logs
 ```
 
-`docker compose up` コマンドを利用して起動すると、初回時のみセーブファイルと設定ファイルが `./Saved` 以下に生成されます。
+初回時のみ、 `docker compose up` コマンドを利用して起動すると、セーブファイルと設定ファイルが `./Saved` 以下に生成されます。
 
 ### サーバーの設定
 
 各設定項目についてはあらかじめPalworldサーバーガイドをご確認ください。
 
-- Palworldサーバーガイド
-[https://tech.palworldgame.com/ja/](https://tech.palworldgame.com/ja/)
-
+[Settings and Operations | Palworld Server Guide](https://tech.palworldgame.com/ja/category/settings-and-operations)
 
 プレイヤー人数やポートの変更など、引数を通した設定を行いたい場合は `compose.yaml` を編集してください。
 
@@ -77,9 +78,4 @@ OptionSettings=(Difficulty=None // ... //)
 
 ### 専用サーバーの更新
 
-`compose.yaml` ファイル内 `image` 部分の末尾を変更することでサーバーの更新を行うことができます。更新作業の際は必ずセーブデータのバックアップを行ってください。
-
-### トラブルシューティング
-
-#### Q. ゲームから接続ができません
-Windows Subsystem for Linuxを利用している場合、 `localhost` で接続できない問題を確認しています。代わりに `127.0.0.1` を利用してください。
+**必ずバックアップを取得してから更新を行ってください。** `docker compose down` コマンドでサーバーを停止し、 `compose.yaml` のイメージタグをゲームバージョンに合わせて変更して `docker compose up -d` コマンドで再起動してください。
