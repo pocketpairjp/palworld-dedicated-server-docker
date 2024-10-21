@@ -16,5 +16,5 @@ services:
       - "8211:8211/udp"
 
     volumes:
-      - ./helper.sh:/pal/helper.sh
+      - ./helper.sh:/pal/helper.sh:ro
       - ./Saved:/pal/Package/Pal/Saved
