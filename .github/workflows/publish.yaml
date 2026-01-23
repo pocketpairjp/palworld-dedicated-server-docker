@@ -16,8 +16,10 @@ jobs:
   publish:
     runs-on: ubuntu-latest
     permissions:
-      contents: read
+      contents: write
       packages: write
+    env:
+      TAG: ${{ github.event.inputs.ghcr_tag_name }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -47,3 +49,21 @@ jobs:
         run: |
           docker push ghcr.io/${{ github.repository_owner }}/palserver:${{ github.event.inputs.ghcr_tag_name }}
           docker push ghcr.io/${{ github.repository_owner }}/palserver:latest
+
+      - name: Update compose.yaml image tag
+        run: |
+          set -euo pipefail
+          sed -i "s|^\\([[:space:]]*image:[[:space:]]*[^[:space:]]*palserver:\\).*|\\1${TAG}|" compose/compose.yaml
+
+      - name: Commit and push compose.yaml
+        run: |
+          set -euo pipefail
+          if git diff --quiet -- compose/compose.yaml; then
+            echo "compose/compose.yaml already up to date"
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add compose/compose.yaml
+          git commit -m "chore: update compose image tag to ${TAG}"
+          git push
