@@ -5,7 +5,7 @@ services:
 
     entrypoint: /pal/helper.sh
 
-    # https://tech.palworldgame.com/settings-and-operation/arguments
+    # https://docs.palworldgame.com/settings-and-operation/arguments
     command:
       - -port=8211
       - -useperfthreads

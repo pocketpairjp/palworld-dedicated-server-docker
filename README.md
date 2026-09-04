@@ -4,14 +4,14 @@
 
 We provide the Docker image and sample Docker Compose files for the official dedicated server, enabling multiplayer for [Palworld](https://www.pocketpair.jp/palworld?lang=en). Please also check the Palworld server guide.
 
-[Introduction | Palworld Server Guide](https://tech.palworldgame.com/)
+[Introduction | Palworld Server Guide](https://docs.palworldgame.com/)
 
 ### Note
 The distributed `compose.yaml` file is a sample. Edit it as necessary to fit your environment and verify that save data is correctly saved before using it.
 
 Also, running this on Windows/macOS using Docker Desktop is not recommended, as disk write/read speeds are limited. Consider using the Steam-based method instead.
 
-[Requirements | Palworld Server Guide](https://tech.palworldgame.com/getting-started/requirements)
+[Requirements | Palworld Server Guide](https://docs.palworldgame.com/getting-started/requirements)
 
 ## Official Dedicated Server Image
 
@@ -44,7 +44,7 @@ When you start the server using the `docker compose up` command, save files and 
 
 For details on each configuration item, please refer to the Palworld Server Guide.
 
-[Settings and Operations | Palworld Server Guide](https://tech.palworldgame.com/category/settings-and-operations)
+[Settings and Operations | Palworld Server Guide](https://docs.palworldgame.com/category/settings-and-operations)
 
 If you want to adjust player count, port settings, or other parameters, edit the `compose.yaml` file.
 
