@@ -4,14 +4,14 @@
 
 [Palworld](https://www.pocketpair.jp/palworld?lang=ja)のマルチプレイを可能にする、公式専用サーバーのDockerイメージとDocker Composeのサンプルを配布しています。 Palworldサーバーガイドも併せてご確認ください。
 
-[はじめに | Palworld Server Guide](https://tech.palworldgame.com/ja/)
+[はじめに | Palworld Server Guide](https://docs.palworldgame.com/ja/)
 
 ### Note
 配布している `compose.yaml` ファイルはサンプルです。ご利用の環境で適宜編集し、セーブデータがきちんと保存されるか確認してからご利用ください。
 
 また、Docker Desktopを用いたWindows / macOS環境での実行はディスク書き込み・読み込み速度が制限されるため非推奨です。代わりにSteamを利用した方法をご検討ください。
 
-[要件 | Palworld Server Guide](https://tech.palworldgame.com/ja/getting-started/requirements)
+[要件 | Palworld Server Guide](https://docs.palworldgame.com/ja/getting-started/requirements)
 
 ## 公式専用サーバーのイメージ
 
@@ -44,7 +44,7 @@ compose.yaml
 
 各設定項目についてはあらかじめPalworldサーバーガイドをご確認ください。
 
-[Settings and Operations | Palworld Server Guide](https://tech.palworldgame.com/ja/category/settings-and-operations)
+[Settings and Operations | Palworld Server Guide](https://docs.palworldgame.com/ja/category/settings-and-operations)
 
 プレイヤー人数やポートの変更など、引数を通した設定を行いたい場合は `compose.yaml` を編集してください。
 
