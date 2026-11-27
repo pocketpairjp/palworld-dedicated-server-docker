@@ -1,16 +1,27 @@
 name: Publish ECR image to GHCR
+run-name: ${{ inputs.request_id && format('Publish image {0}', inputs.request_id) || 'Publish ECR image to GHCR' }}
 
 on:
   workflow_dispatch:
     inputs:
       ecr_tag_name:
-        description: 'Tag name in ECR to pull'
+        description: Tag name in ECR to pull
         required: true
-        default: 'latest'
+        default: latest
       ghcr_tag_name:
-        description: 'Tag name in GHCR to push'
+        description: Tag name in GHCR to push
         required: true
-        default: 'latest'
+        default: latest
+      expected_digest:
+        description: Optional verified source manifest digest
+        type: string
+      request_id:
+        description: Optional release tracking ID
+        type: string
+
+concurrency:
+  group: publish-palserver-image
+  cancel-in-progress: false
 
 jobs:
   publish:
@@ -19,47 +30,64 @@ jobs:
       contents: write
       packages: write
     env:
-      TAG: ${{ github.event.inputs.ghcr_tag_name }}
+      TAG: ${{ inputs.ghcr_tag_name }}
+      ECR_TAG: ${{ inputs.ecr_tag_name }}
+      EXPECTED: ${{ inputs.expected_digest }}
+      ECR: ${{ secrets.ECR_REPO_DOMAIN }}/palserver_linux_shipping
+      DEST: ghcr.io/${{ github.repository_owner }}/palserver
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-      - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v4
+      - name: Check requested tags
+        run: |
+          set -euo pipefail
+          for tag in "$TAG" "$ECR_TAG"; do
+            [[ "$tag" =~ ^[a-zA-Z0-9_][a-zA-Z0-9_.-]{0,127}$ ]]
+          done
+          if [[ -n "$EXPECTED" ]]; then
+            [[ "$EXPECTED" =~ ^sha256:[a-f0-9]{64}$ && "$TAG" != latest && "$GITHUB_REF_NAME" == main ]]
+          fi
+
+      - uses: aws-actions/configure-aws-credentials@v4
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ secrets.AWS_DEFAULT_REGION }}
 
-      - name: Login to Amazon ECR
-        uses: aws-actions/amazon-ecr-login@v2
-
-      - name: Pull image from ECR
-        run: docker pull ${{ secrets.ECR_REPO_DOMAIN }}/palserver_linux_shipping:${{ github.event.inputs.ecr_tag_name }}
-
-      - name: Login to GHCR
-        run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
-
-      - name: Tag image for GHCR
+      - name: Publish image
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: |
-          docker tag ${{ secrets.ECR_REPO_DOMAIN }}/palserver_linux_shipping:${{ github.event.inputs.ecr_tag_name }} ghcr.io/${{ github.repository_owner }}/palserver:${{ github.event.inputs.ghcr_tag_name }}
-          docker tag ${{ secrets.ECR_REPO_DOMAIN }}/palserver_linux_shipping:${{ github.event.inputs.ecr_tag_name }} ghcr.io/${{ github.repository_owner }}/palserver:latest
-
-      - name: Push image to GHCR
-        run: |
-          docker push ghcr.io/${{ github.repository_owner }}/palserver:${{ github.event.inputs.ghcr_tag_name }}
-          docker push ghcr.io/${{ github.repository_owner }}/palserver:latest
+          set -euo pipefail
+          sudo apt-get -qq update && sudo apt-get -qq install -y skopeo
+          aws ecr get-login-password | skopeo login --username AWS --password-stdin "${ECR%%/*}"
+          printf '%s' "$GH_TOKEN" | skopeo login --username "$GITHUB_ACTOR" --password-stdin ghcr.io
+          src="docker://$ECR:$ECR_TAG"
+          if [[ -n "$EXPECTED" ]]; then
+            actual=$(skopeo inspect --format '{{.Digest}}' "$src")
+            [[ "$actual" == "$EXPECTED" ]]
+            src="docker://$ECR@$EXPECTED"
+            # NOTE: list-tags must succeed before a missing tag is treated as available.
+            tags=$(skopeo list-tags "docker://$DEST")
+            if jq -e --arg tag "$TAG" '.Tags | index($tag) != null' <<<"$tags" >/dev/null; then
+              existing=$(skopeo inspect --format '{{.Digest}}' "docker://$DEST:$TAG")
+              [[ "$existing" == "$EXPECTED" ]]
+            fi
+          fi
+          skopeo copy --all --preserve-digests "$src" "docker://$DEST:$TAG"
+          if [[ -n "$EXPECTED" ]]; then
+            published=$(skopeo inspect --format '{{.Digest}}' "docker://$DEST:$TAG")
+            [[ "$published" == "$EXPECTED" ]]
+          fi
+          if [[ "$TAG" != latest ]]; then
+            skopeo copy --all --preserve-digests "docker://$DEST:$TAG" "docker://$DEST:latest"
+          fi
 
       - name: Update compose.yaml image tag
         run: |
           set -euo pipefail
           sed -i "s|^\\([[:space:]]*image:[[:space:]]*[^[:space:]]*palserver:\\).*|\\1${TAG}|" compose/compose.yaml
-
-      - name: Commit and push compose.yaml
-        run: |
-          set -euo pipefail
           if git diff --quiet -- compose/compose.yaml; then
-            echo "compose/compose.yaml already up to date"
             exit 0
           fi
           git config user.name "github-actions[bot]"
